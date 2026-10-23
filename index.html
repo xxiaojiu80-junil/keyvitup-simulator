@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KEYVITUP — Backstage Simulator</title>
+<style>
+:root{--bg:#f5f5f3;--card:#fff;--ink:#171717;--muted:#8b8b8b;--line:#e8e8e5;--accent:#171717;--soft:#f0f0ed}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR","Noto Sans SC",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{max-width:720px;margin:auto;min-height:100vh;background:var(--card);display:flex;flex-direction:column}
+header{position:sticky;top:0;z-index:4;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 18px}
+.head{display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;letter-spacing:.08em}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.icon{border:1px solid var(--line);background:white;border-radius:12px;width:38px;height:38px}
+main{flex:1;padding:18px 16px 130px}
+.scene{background:var(--soft);border-radius:18px;padding:14px 15px;margin-bottom:18px}
+.scene b{font-size:13px}.scene p{margin:6px 0 0;font-size:13px;color:#666;line-height:1.55}
+.msg{display:flex;gap:10px;margin:15px 0;align-items:flex-start}.msg.me{justify-content:flex-end}.avatar{width:38px;height:38px;border-radius:50%;background:#e8e8e8;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}.bubble{max-width:78%;padding:11px 13px;border-radius:15px;background:#f2f2f0;line-height:1.55;font-size:14px;white-space:pre-wrap}.me .bubble{background:#171717;color:white;border-radius:15px 5px 15px 15px}.name{font-size:11px;color:#888;margin:0 0 4px 2px}.typing{color:#999;font-size:12px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);background:rgba(255,255,255,.96);backdrop-filter:blur(15px);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.row{display:flex;gap:8px}.input{flex:1;border:1px solid var(--line);border-radius:14px;padding:11px 12px;outline:none;min-width:0}.send{border:0;background:#171717;color:white;border-radius:14px;padding:0 17px;font-weight:700}
+.start{padding:30px 20px}.hero h1{font-size:30px;margin:0 0 8px}.hero p{color:#777;line-height:1.6;font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}.choice{padding:15px;border:1px solid var(--line);background:white;border-radius:15px;text-align:left}.choice strong{display:block}.choice span{display:block;color:#888;font-size:12px;margin-top:4px}.choice.selected{border-color:#171717;box-shadow:0 0 0 1px #171717 inset}.primary{width:100%;border:0;background:#171717;color:white;border-radius:15px;padding:14px;font-weight:700}
+.hidden{display:none!important}.small{font-size:12px;color:#888;margin-top:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10;display:grid;place-items:end center}.sheet{width:min(720px,100%);background:white;border-radius:22px 22px 0 0;padding:20px}.sheet h3{margin:0 0 12px}.sheet label{font-size:12px;color:#777}.sheet input,.sheet textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;margin:6px 0 13px;outline:none}.sheet textarea{height:90px;resize:none}.sheet .row button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:white}.sheet .row .ok{background:#171717;color:white;border-color:#171717}
+@media(min-width:721px){body{padding:20px 0}.app{border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="head">
+    <div><div class="brand">KEYVITUP</div><div class="sub" id="headerSub">BACKSTAGE SIMULATOR · DAY 01</div></div>
+    <button class="icon" onclick="openSettings()">☰</button>
+  </div>
+</header>
+
+<main id="start" class="start">
+  <section class="hero">
+    <h1>KEYVITUP<br>Backstage Simulator</h1>
+    <p>出道初期到上升期。宿舍、练习室、后台、保姆车，还有一群每天都很累但还是会犯蠢的年轻人。</p>
+  </section>
+  <h3>选择你的身份</h3>
+  <div class="grid" id="roles">
+    <button class="choice selected" data-role="工作人员"><strong>工作人员</strong><span>最容易进入日常行程</span></button>
+    <button class="choice" data-role="摄影师"><strong>摄影师</strong><span>后台和拍摄现场</span></button>
+    <button class="choice" data-role="女爱豆"><strong>女爱豆</strong><span>同期活动与后台接触</span></button>
+    <button class="choice" data-role="模特"><strong>模特</strong><span>品牌与拍摄合作</span></button>
+    <button class="choice" data-role="留学生"><strong>留学生</strong><span>从生活圈慢慢认识</span></button>
+    <button class="choice" data-role="自定义"><strong>自定义</strong><span>自己定义身份</span></button>
+  </div>
+  <button class="primary" onclick="begin()">进入 KEYVITUP 的生活</button>
+  <div class="small">关系不会自动发生。成员有自己的工作、朋友、情绪和团内关系。</div>
+</main>
+
+<main id="chat" class="hidden"></main>
+
+<div id="bottom" class="bottom hidden">
+  <div class="row">
+    <input id="input" class="input" placeholder="输入你想说的话…" onkeydown="if(event.key==='Enter')send()">
+    <button class="send" onclick="send()">发送</button>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden" onclick="if(event.target===this)closeSettings()">
+ <div class="sheet">
+  <h3>玩家设置</h3>
+  <label>玩家名字</label><input id="pname" placeholder="例如：JUN">
+  <label>玩家身份</label><input id="prole" placeholder="工作人员">
+  <label>当前关系/背景（可选）</label><textarea id="pback" placeholder="例如：今天第一次负责他们的后台拍摄"></textarea>
+  <div class="row"><button onclick="closeSettings()">取消</button><button class="ok" onclick="saveSettings()">保存</button></div>
+ </div>
+</div>
+<script>
+const members={
+ Hyunmin:{role:"队长",desc:"负责收场。懒得解释，但真出事会先处理。"},
+ Taehwan:{role:"大哥 / 主唱",desc:"脾气很好，最容易发现别人状态不对。"},
+ Sena:{role:"气氛缓冲区",desc:"镜头感很好，喜欢把沉重的话题变轻。"},
+ Jaein:{role:"主舞 / 气氛发动机",desc:"很会接话，后台经常最吵。"},
+ Rukia:{role:"忙内",desc:"嘴硬，戴耳机，熬夜严重，很在意粉丝评价。"}
+};
+let state={role:"工作人员",name:"",day:1,scene:"后台",started:false};
+const scripts=[
+ {speaker:"Jaein",text:"“谁把我的充电器拿走了？”"},
+ {speaker:"Sena",text:"“你先看看你自己包里。”"},
+ {speaker:"Jaein",text:"“……哦。”\n他从包里翻出充电器，沉默两秒，“当我没问。”"},
+ {speaker:"Rukia",text:"“你每天都这样。”"},
+ {speaker:"Hyunmin",text:"“还有八分钟上台。别吵。”"},
+ {speaker:"Taehwan",text:"他靠在沙发里看了一眼手机，又抬头看向工作人员区。 “今天谁负责后台？”"}
+];
+let idx=0;
+function begin(){
+ state.started=true;document.getElementById("start").classList.add("hidden");document.getElementById("chat").classList.remove("hidden");document.getElementById("bottom").classList.remove("hidden");
+ renderScene("后台 · 回归前的最后一次彩排","KEYVITUP刚结束舞台走位。后台很吵，工作人员来回跑，成员们在休息区抢最后几口饮料。");
+ scripts.slice(0,2).forEach(addMember); addMember({speaker:"Taehwan",text:"“今天谁负责后台？”"});
+}
+function renderScene(title,desc){const c=document.getElementById("chat");c.innerHTML=`<div class="scene"><b>${title}</b><p>${desc}</p></div>`;}
+function addMember(m){const c=document.getElementById("chat");let initials=m.speaker[0];c.insertAdjacentHTML("beforeend",`<div class="msg"><div class="avatar">${initials}</div><div><div class="name">${m.speaker} · ${members[m.speaker]?.role||""}</div><div class="bubble">${escape(m.text)}</div></div></div>`);scroll();}
+function addMe(t){document.getElementById("chat").insertAdjacentHTML("beforeend",`<div class="msg me"><div class="bubble">${escape(t)}</div></div>`);scroll();}
+function escape(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function send(){
+ const el=document.getElementById("input"),t=el.value.trim();if(!t)return;el.value="";addMe(t);
+ setTimeout(()=>react(t),350+Math.random()*450);
+}
+function react(t){
+ const lower=t.toLowerCase();let replies;
+ if(lower.includes("充电")||t.includes("充电")) replies=[
+  ["Jaein","“不是我的。”"],
+  ["Rukia","“你问他干嘛，他现在明显在找自己的。”"],
+  ["Hyunmin","“桌上还有一个。拿那个。”"]
+ ];
+ else if(lower.includes("累")||t.includes("累")) replies=[
+  ["Taehwan","“嗯。今天确实有点累。”"],
+  ["Sena","“你先坐。我们等会儿还有采访。”"]
+ ];
+ else replies=[
+  ["Sena","他看了你一眼，“哦，你是今天负责这边的人？”"],
+  ["Jaein","“你第一次来吧？”"],
+  ["Hyunmin","“行，先把工作做完。”"]
+ ];
+ replies.forEach((x,i)=>setTimeout(()=>addMember({speaker:x[0],text:x[1]}),i*650));
+}
+function scroll(){setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"}),50)}
+document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");state.role=b.dataset.role;});
+function openSettings(){document.getElementById("modal").classList.remove("hidden");document.getElementById("pname").value=state.name;document.getElementById("prole").value=state.role}
+function closeSettings(){document.getElementById("modal").classList.add("hidden")}
+function saveSettings(){state.name=document.getElementById("pname").value.trim();state.role=document.getElementById("prole").value.trim()||state.role;document.getElementById("headerSub").textContent=`BACKSTAGE SIMULATOR · DAY ${state.day} · ${state.role}`;closeSettings()}
+</script>
+</div>
+</body>
+</html>
